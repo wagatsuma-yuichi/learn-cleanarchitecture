@@ -1,4 +1,4 @@
-from typing import Dict, Any, Optional, List
+from typing import Dict, Any, List
 from fastapi import status
 
 class HttpResponseViewModel:
@@ -44,11 +44,4 @@ class HttpResponseUserListViewModel(HttpResponseViewModel):
     
     def get_users(self) -> List[Dict[str, Any]]:
         """ユーザーリストを取得"""
-        return self.body["users"]
-
-class HttpResponseErrorViewModel(HttpResponseViewModel):
-    """エラー情報を含むHTTP応答用ビューモデル"""
-    
-    def __init__(self, status_code: int = status.HTTP_400_BAD_REQUEST, message: str = ""):
-        super().__init__(status_code)
-        self.body = {"error": True, "message": message} 
+        return self.body["users"] 

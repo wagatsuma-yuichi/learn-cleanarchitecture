@@ -29,16 +29,11 @@ class HttpResponseView:
         """ユーザーリストビューモデルからJSONデータを生成"""
         return view_model.get_users()
 
-class HttpResponseErrorViewModel(HttpResponseUserListViewModel):
-    """HTTPレスポンスのエラービューモデル"""
-
-    def __init__(self, error: str):
-        self.error = error
-
-    def get_users(self) -> list[dict]:
-        """ユーザーリストを取得"""
-        return []
-
-    def get_error(self) -> str:
-        """エラーメッセージを取得"""
-        return self.error 
+    @staticmethod
+    def render_error(view_model: HttpResponseViewModel) -> JSONResponse:
+        """エラービューモデルからHTTPレスポンスを生成"""
+        body = view_model.get_body()
+        return JSONResponse(
+            content=body,
+            status_code=view_model.get_status_code()
+        )
