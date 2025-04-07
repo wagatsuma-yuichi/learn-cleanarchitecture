@@ -2,10 +2,11 @@ from fastapi import Depends
 from typing import Annotated
 import os
 
-from config.settings import get_settings, Settings
-from usecases.user.usecase import UserRepositoryInterface, UserUseCasesInteractor, UserInputBoundary
+from config.settings import get_settings
+from usecases.user.usecase import UserRepositoryInterface, UserUseCasesInteractor, UserInputBoundary, UserOutputBoundary
 from infrastructure.database.user.repository import UserRepositoryImpl
 from infrastructure.mock.user.repository import MockUserRepositoryImpl
+from interfaces.presenters.user.presenter import UserPresenter
 
 def get_repository() -> UserRepositoryInterface:
     """環境設定に基づいてリポジトリを提供"""
@@ -35,8 +36,13 @@ def get_repository() -> UserRepositoryInterface:
             print(f"Connecting to database with URL: {db_url}")
             return UserRepositoryImpl(db_url=db_url)
 
+def get_presenter() -> UserOutputBoundary:
+    """プレゼンターを提供"""
+    return UserPresenter()
+
 def get_usecase(
-    repo: Annotated[UserRepositoryInterface, Depends(get_repository)]
+    repo: Annotated[UserRepositoryInterface, Depends(get_repository)],
+    presenter: Annotated[UserOutputBoundary, Depends(get_presenter)]
 ) -> UserInputBoundary:
     """ユースケースを提供"""
-    return UserUseCasesInteractor(repo) 
+    return UserUseCasesInteractor(repo, presenter) 
