@@ -1,10 +1,10 @@
-
 from fastapi.responses import JSONResponse
 from typing import Dict, Any, List
 
 from interfaces.views.view_models import (
     HttpResponseViewModel,
     HttpResponseUserListViewModel,
+    HttpResponseErrorViewModel,
 )
 
 class HttpResponseView:
@@ -27,4 +27,18 @@ class HttpResponseView:
     @staticmethod
     def render_users_json(view_model: HttpResponseUserListViewModel) -> List[Dict[str, Any]]:
         """ユーザーリストビューモデルからJSONデータを生成"""
-        return view_model.get_users() 
+        return view_model.get_users()
+
+class HttpResponseErrorViewModel(HttpResponseUserListViewModel):
+    """HTTPレスポンスのエラービューモデル"""
+
+    def __init__(self, error: str):
+        self.error = error
+
+    def get_users(self) -> list[dict]:
+        """ユーザーリストを取得"""
+        return []
+
+    def get_error(self) -> str:
+        """エラーメッセージを取得"""
+        return self.error 

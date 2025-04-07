@@ -1,4 +1,3 @@
-import os
 import uvicorn
 from fastapi import FastAPI
 
@@ -17,7 +16,7 @@ async def root():
     return {
         "message": f"{env.APP_NAME} API",
         "version": env.API_VERSION,
-        "environment": os.getenv("ENV", "development"),
+        "environment": env.APP_ENV,
         "using_mock": env.USE_MOCK_DB,
         "database_url": env.DATABASE_URL
     }

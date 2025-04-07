@@ -1,7 +1,7 @@
 from fastapi import status
 
-from usecases.user.usecase import UserAddOutputBoundary, UserGetOutputBoundary, UserGetAllOutputBoundary
-from usecases.user.data import UserAddOutputData, UserGetOutputData, UserGetAllOutputData, ErrorOutputData
+from usecases.user.usecase import UserAddOutputBoundary, UserGetOutputBoundary, UserGetAllOutputBoundary, UserDeleteOutputBoundary
+from usecases.user.data import UserAddOutputData, UserGetOutputData, UserGetAllOutputData, ErrorOutputData, UserDeleteOutputData
 from interfaces.views.view_models import (
     HttpResponseUserViewModel,
     HttpResponseUserListViewModel,
@@ -55,6 +55,25 @@ class HttpResponseUserGetAllPresenter(UserGetAllOutputBoundary):
     
     def output(self, output_data: UserGetAllOutputData) -> None:
         """全ユーザー取得結果をビューモデルに変換"""
+        self.view_model = HttpResponseUserListViewModel()
+        self.view_model.set_body({"users": output_data.to_dict()["users"]})
+    
+    def output_error(self, output_data: ErrorOutputData) -> None:
+        """エラー情報をビューモデルに変換"""
+        self.view_model = HttpResponseErrorViewModel(status.HTTP_500_INTERNAL_SERVER_ERROR, output_data.message)
+    
+    def get_view_model(self) -> HttpResponseUserListViewModel:
+        """ビューモデルを取得"""
+        return self.view_model 
+    
+class HttpResponseUserDeletePresenter(UserDeleteOutputBoundary):
+    """ユーザー削除結果をHTTPレスポンス用に変換するプレゼンター"""
+    
+    def __init__(self):
+        self.view_model = HttpResponseUserListViewModel()
+    
+    def output(self, output_data: UserDeleteOutputData) -> None:
+        """ユーザー削除結果をビューモデルに変換"""
         self.view_model = HttpResponseUserListViewModel()
         self.view_model.set_body({"users": output_data.to_dict()["users"]})
     

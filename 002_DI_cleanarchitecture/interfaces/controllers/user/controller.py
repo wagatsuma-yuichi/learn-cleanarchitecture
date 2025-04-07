@@ -2,15 +2,15 @@ from fastapi import APIRouter, Depends, Query
 from typing import Annotated
 
 from usecases.user.usecase import (
-    UserAddInputBoundary, UserGetInputBoundary, UserGetAllInputBoundary
+    UserAddInputBoundary, UserGetInputBoundary, UserGetAllInputBoundary, UserDeleteInputBoundary
 )
-from usecases.user.data import UserAddInputData, UserGetInputData, UserGetAllInputData
+from usecases.user.data import UserAddInputData, UserGetInputData, UserGetAllInputData, UserDeleteInputData
 from infrastructure.dependencies import (
     get_user_add_usecase, get_user_get_usecase, get_user_get_all_usecase,
-    get_user_add_presenter, get_user_get_presenter, get_user_get_all_presenter
+    get_user_add_presenter, get_user_get_presenter, get_user_get_all_presenter, get_user_delete_usecase, get_user_delete_presenter
 )
 from interfaces.presenters.user.http_response_presenter import (
-    HttpResponseUserAddPresenter, HttpResponseUserGetPresenter, HttpResponseUserGetAllPresenter
+    HttpResponseUserAddPresenter, HttpResponseUserGetPresenter, HttpResponseUserGetAllPresenter, HttpResponseUserDeletePresenter
 )
 from interfaces.views.http_response_view import HttpResponseView
 
@@ -66,4 +66,23 @@ class UserController:
             # 単純な辞書やリストを返す場合はrender_jsonメソッドを使用
             return HttpResponseView.render_users_json(view_model)
             
+        @router.delete("/users/{user_id}")
+        async def delete_user_endpoint(
+            user_id: int,
+            usecase: Annotated[UserDeleteInputBoundary, Depends(get_user_delete_usecase)],
+            presenter: Annotated[HttpResponseUserDeletePresenter, Depends(get_user_delete_presenter)]
+        ):
+            input_data = UserDeleteInputData(user_id=user_id)
+            usecase.handle(input_data)
+            view_model = presenter.get_view_model()
+            
+            # エラーチェック
+            if "error" in view_model.get_body():
+                return HttpResponseView.render(view_model)
+            
+            # 正常応答
+            return HttpResponseView.render(view_model)
+        
         return router
+    
+    

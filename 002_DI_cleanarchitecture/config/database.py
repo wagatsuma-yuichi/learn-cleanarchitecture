@@ -17,7 +17,7 @@ def get_repository(db_url: str | None = None) -> UserRepositoryInterface:
 
     if db_url is None:
         # モックリポジトリを使用
-        print(f"Using mock repository for environment: {env.ENV}")
+        print(f"Using mock repository for environment: {env.APP_ENV}")
         return MockUserRepositoryImpl()
 
     # PostgreSQLに接続

@@ -6,7 +6,7 @@ from usecases.user.data import (
     UserAddInputData, UserAddOutputData, 
     UserGetInputData, UserGetOutputData,
     UserGetAllInputData, UserGetAllOutputData,
-    ErrorOutputData
+    ErrorOutputData, UserDeleteInputData, UserDeleteOutputData
 )
 
 class UserRepositoryInterface(Protocol):
@@ -17,6 +17,9 @@ class UserRepositoryInterface(Protocol):
         raise NotImplementedError
 
     def get_all_users(self) -> List[User]:
+        raise NotImplementedError
+    
+    def delete_user(self, user_id: int) -> None:
         raise NotImplementedError
 
 class UserAddOutputBoundary(Protocol):
@@ -53,6 +56,18 @@ class UserGetInputBoundary(ABC):
 class UserGetAllInputBoundary(ABC):
     @abstractmethod
     def handle(self, input_data: UserGetAllInputData) -> None:
+        raise NotImplementedError
+
+class UserDeleteInputBoundary(ABC):
+    @abstractmethod
+    def handle(self, input_data: UserDeleteInputData) -> None:
+        raise NotImplementedError
+    
+class UserDeleteOutputBoundary(Protocol):
+    def output(self, output_data: UserDeleteOutputData) -> None:
+        raise NotImplementedError
+        
+    def output_error(self, output_data: ErrorOutputData) -> None:
         raise NotImplementedError
 
 class UserAddInteractor(UserAddInputBoundary):
@@ -93,6 +108,20 @@ class UserGetAllInteractor(UserGetAllInputBoundary):
         try:
             users = self.user_repository.get_all_users()
             output_data = UserGetAllOutputData(users)
+            self.presenter.output(output_data)
+        except Exception as e:
+            error_output = ErrorOutputData(str(e))
+            self.presenter.output_error(error_output)
+
+class UserDeleteInteractor(UserDeleteInputBoundary):
+    def __init__(self, user_repository: UserRepositoryInterface, presenter: UserDeleteOutputBoundary):
+        self.user_repository = user_repository
+        self.presenter = presenter
+
+    def handle(self, input_data: UserDeleteInputData) -> None:
+        try:
+            users = self.user_repository.delete_user(input_data.user_id)
+            output_data = UserDeleteOutputData(users)
             self.presenter.output(output_data)
         except Exception as e:
             error_output = ErrorOutputData(str(e))

@@ -64,3 +64,17 @@ class UserRepositoryImpl(UserRepositoryInterface):
             return [User(id=user.id, name=user.name, email=user.email) for user in db_users]
         finally:
             db.close()
+
+    def delete_user(self, user_id: int) -> None:
+        """ユーザーを削除"""
+        db = self.SessionLocal()
+        try:
+            db_user = db.query(UserModel).filter(UserModel.id == user_id).first()
+            if db_user is None:
+                raise Exception("User not found")
+            db.delete(db_user)
+            db.commit()
+        except Exception as e:
+            db.rollback()
+            print(f"Error deleting user: {e}")
+            raise

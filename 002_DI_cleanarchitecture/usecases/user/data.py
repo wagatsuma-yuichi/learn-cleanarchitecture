@@ -68,6 +68,15 @@ class UserGetAllOutputData(OutputData):
         """辞書形式に変換"""
         return {"users": self.users}
 
+class UserDeleteInputData(InputData['UserDeleteOutputData']):
+    """ユーザー削除用の入力データ"""
+    def __init__(self, user_id: int):
+        self.user_id = user_id
+
+class UserDeleteOutputData(OutputData):
+    """ユーザー削除用の出力データ"""
+    pass
+
 class ErrorOutputData(OutputData):
     """エラー用の出力データ"""
     def __init__(self, message: str):
