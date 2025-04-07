@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 
-from usecases.user_usecase import UserInputBoundary, User
+from usecases.user.usecase import UserInputBoundary, User
 
 router = APIRouter()
 

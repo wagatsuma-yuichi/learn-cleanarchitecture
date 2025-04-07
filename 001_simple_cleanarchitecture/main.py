@@ -1,8 +1,8 @@
 from fastapi import FastAPI
 
-from interfaces.controllers.user_controller import UserController
-from usecases.user_usecase import UserUseCasesInteractor
-from infrastructure.database.user_repository_impl import UserRepositoryImpl
+from interfaces.controllers.user.controller import UserController
+from usecases.user.usecase import UserUseCasesInteractor
+from infrastructure.database.user.repository import UserRepositoryImpl
 
 app = FastAPI()
 

@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import Protocol, List
 
-from entities.user import User
+from entities.user.entity import User
 
 class UserRepositoryInterface(Protocol):
     def create_user(self, user: User) -> User:
