@@ -12,7 +12,7 @@ from infrastructure.dependencies import (
 from interfaces.presenters.user.http_response_presenter import (
     HttpResponseUserAddPresenter, HttpResponseUserGetPresenter, HttpResponseUserGetAllPresenter, HttpResponseUserDeletePresenter
 )
-from interfaces.views.http_response_view import HttpResponseView
+from interfaces.views.http_response_view import HttpResponseView, HttpResponseErrorViewModel
 
 router = APIRouter()
 
@@ -31,7 +31,7 @@ class UserController:
             
             # エラーチェック
             if "error" in view_model.get_body():
-                return HttpResponseView.render(view_model)
+                return HttpResponseErrorViewModel.render(view_model)
             
             # 正常応答
             return HttpResponseView.render(view_model)
@@ -48,7 +48,7 @@ class UserController:
             
             # エラーチェック
             if "error" in view_model.get_body():
-                return HttpResponseView.render(view_model)
+                return HttpResponseErrorViewModel.render(view_model)
             
             # 正常応答
             return HttpResponseView.render(view_model)
@@ -61,6 +61,9 @@ class UserController:
             input_data = UserGetAllInputData()
             usecase.handle(input_data)
             view_model = presenter.get_view_model()
+
+            if "error" in view_model.get_body():
+                return HttpResponseErrorViewModel.render(view_model)
             
             # FastAPIはJSONのシリアライズを自動的に行うため、
             # 単純な辞書やリストを返す場合はrender_jsonメソッドを使用
@@ -78,7 +81,7 @@ class UserController:
             
             # エラーチェック
             if "error" in view_model.get_body():
-                return HttpResponseView.render(view_model)
+                return HttpResponseErrorViewModel.render(view_model)
             
             # 正常応答
             return HttpResponseView.render(view_model)
