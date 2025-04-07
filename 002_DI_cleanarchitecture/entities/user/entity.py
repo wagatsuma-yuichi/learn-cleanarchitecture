@@ -4,7 +4,7 @@ class User(BaseModel):
     """ユーザーエンティティ"""
     id: int = Field(gt=0, default=0, description="ユーザーID")
     name: str = Field(min_length=1, max_length=100, description="ユーザー名")
-    email: str = EmailStr
+    email: EmailStr
 
     # カスタム検証: 特定のドメインのみ許可する例
     @validator('email')
@@ -15,3 +15,7 @@ class User(BaseModel):
         if domain not in allowed_domains:
             raise ValueError(f"メールドメインは次のいずれかである必要があります: {', '.join(allowed_domains)}")
         return v
+        
+    class Config:
+        # Pydantic 1.xのvalidatorで必要なフィールド検証設定
+        validate_assignment = True

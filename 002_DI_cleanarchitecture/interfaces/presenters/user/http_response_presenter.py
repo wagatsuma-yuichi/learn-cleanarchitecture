@@ -22,7 +22,7 @@ class HttpResponseUserAddPresenter(UserAddOutputBoundary):
     
     def output_error(self, output_data: ErrorOutputData) -> None:
         """エラー情報をビューモデルに変換"""
-        self.view_model = HttpResponseErrorViewModel(status.HTTP_400_BAD_REQUEST, output_data.message)
+        self.view_model = HttpResponseErrorViewModel(output_data.status_code, output_data.message)
     
     def get_view_model(self) -> HttpResponseUserViewModel:
         """ビューモデルを取得"""
@@ -41,7 +41,7 @@ class HttpResponseUserGetPresenter(UserGetOutputBoundary):
     
     def output_error(self, output_data: ErrorOutputData) -> None:
         """エラー情報をビューモデルに変換"""
-        self.view_model = HttpResponseErrorViewModel(status.HTTP_404_NOT_FOUND, output_data.message)
+        self.view_model = HttpResponseErrorViewModel(output_data.status_code, output_data.message)
     
     def get_view_model(self) -> HttpResponseUserViewModel:
         """ビューモデルを取得"""
@@ -60,7 +60,7 @@ class HttpResponseUserGetAllPresenter(UserGetAllOutputBoundary):
     
     def output_error(self, output_data: ErrorOutputData) -> None:
         """エラー情報をビューモデルに変換"""
-        self.view_model = HttpResponseErrorViewModel(status.HTTP_500_INTERNAL_SERVER_ERROR, output_data.message)
+        self.view_model = HttpResponseErrorViewModel(output_data.status_code, output_data.message)
     
     def get_view_model(self) -> HttpResponseUserListViewModel:
         """ビューモデルを取得"""
@@ -79,7 +79,7 @@ class HttpResponseUserDeletePresenter(UserDeleteOutputBoundary):
     
     def output_error(self, output_data: ErrorOutputData) -> None:
         """エラー情報をビューモデルに変換"""
-        self.view_model = HttpResponseErrorViewModel(status.HTTP_500_INTERNAL_SERVER_ERROR, output_data.message)
+        self.view_model = HttpResponseErrorViewModel(output_data.status_code, output_data.message)
     
     def get_view_model(self) -> HttpResponseUserListViewModel:
         """ビューモデルを取得"""

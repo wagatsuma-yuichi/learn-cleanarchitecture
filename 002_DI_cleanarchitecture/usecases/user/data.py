@@ -79,9 +79,10 @@ class UserDeleteOutputData(OutputData):
 
 class ErrorOutputData(OutputData):
     """エラー用の出力データ"""
-    def __init__(self, message: str):
+    def __init__(self, message: str, status_code: int = 404):
         self.error = True
         self.message = message
+        self.status_code = status_code
     
     def to_dict(self) -> Dict[str, Any]:
         """辞書形式に変換"""

@@ -44,4 +44,14 @@ class HttpResponseUserListViewModel(HttpResponseViewModel):
     
     def get_users(self) -> List[Dict[str, Any]]:
         """ユーザーリストを取得"""
-        return self.body["users"] 
+        return self.body["users"]
+
+class HttpResponseErrorViewModel(HttpResponseViewModel):
+    """エラー情報を含むHTTP応答用ビューモデル"""
+    
+    def __init__(self, status_code: int = status.HTTP_400_BAD_REQUEST, message: str = "エラーが発生しました"):
+        super().__init__(status_code)
+        self.body = {
+            "error": True,
+            "message": message
+        } 
