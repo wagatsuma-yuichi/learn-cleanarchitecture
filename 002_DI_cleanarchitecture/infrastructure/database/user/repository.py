@@ -1,7 +1,7 @@
 from sqlalchemy import create_engine, Column, Integer, String
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
-from typing import List, Optional
+from typing import List
 
 from entities.user.entity import User
 from usecases.user.usecase import UserRepositoryInterface
@@ -17,35 +17,16 @@ class UserModel(Base):
 
 class UserRepositoryImpl(UserRepositoryInterface):
     """実際のデータベースを使用するリポジトリ実装"""
-    def __init__(self, db_path: Optional[str] = None, db_url: Optional[str] = None):
+    def __init__(self, db_url: str):
         """
         初期化
         Args:
-            db_path: SQLiteのDBパス（オプション）
-            db_url: 完全なDB URL（オプション）
+            db_url: データベースURL
         """
-        if db_url:
-            # 完全なDB URL（PostgreSQL、MySQLなど）
-            print(f"Creating engine with URL: {db_url}")
-            self.engine = create_engine(db_url)
-        elif db_path:
-            # SQLite用のパス
-            sqlite_url = f"sqlite:///{db_path}"
-            print(f"Creating engine with URL: {sqlite_url}")
-            self.engine = create_engine(sqlite_url)
-        else:
-            # デフォルトはインメモリSQLite
-            print("Creating in-memory SQLite engine")
-            self.engine = create_engine("sqlite:///:memory:")
-        
-        # テーブル作成
-        try:
-            Base.metadata.create_all(self.engine)
-            print("Database tables created successfully")
-        except Exception as e:
-            print(f"Error creating database tables: {e}")
-            
+        self.db_url = db_url
+        self.engine = create_engine(db_url)
         self.SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=self.engine)
+        Base.metadata.create_all(bind=self.engine)
     
     def create_user(self, user: User) -> User:
         """ユーザーを作成"""
