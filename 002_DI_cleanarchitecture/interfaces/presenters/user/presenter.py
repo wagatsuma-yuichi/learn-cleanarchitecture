@@ -1,43 +1,96 @@
 from typing import Dict, List, Any
 from entities.user.entity import User
-from usecases.user.usecase import UserOutputBoundary
+from usecases.user.usecase import UserAddOutputBoundary, UserGetOutputBoundary, UserGetAllOutputBoundary
+from usecases.user.data import (
+    UserAddOutputData, UserGetOutputData, 
+    UserGetAllOutputData, ErrorOutputData
+)
 
 class UserViewModel:
-    """ユーザー表示用のビューモデル"""
-    def __init__(self, id: int, name: str, email: str, display_name: str = None):
-        self.id = id
-        self.name = name
-        self.email = email
-        self.display_name = display_name or name
+    """表示用のビューモデルの基底クラス"""
+    def __init__(self):
+        self.data = {}
         
     def to_dict(self) -> Dict[str, Any]:
-        return {
-            "id": self.id,
-            "name": self.name,
-            "email": self.email,
-            "display_name": self.display_name
-        }
+        return self.data
+        
+class UserAddViewModel(UserViewModel):
+    """ユーザー登録結果の表示用モデル"""
+    def __init__(self):
+        super().__init__()
+        self.data = {}
+        
+class UserGetViewModel(UserViewModel):
+    """ユーザー取得結果の表示用モデル"""
+    def __init__(self):
+        super().__init__()
+        self.data = {}
+        
+class UserGetAllViewModel(UserViewModel):
+    """全ユーザー取得結果の表示用モデル"""
+    def __init__(self):
+        super().__init__()
+        self.data = {"users": []}
+        
+class ErrorViewModel(UserViewModel):
+    """エラー表示用モデル"""
+    def __init__(self):
+        super().__init__()
+        self.data = {"error": True, "message": ""}
 
-class UserPresenter(UserOutputBoundary):
-    """ユーザー情報の表示形式を変換するプレゼンター"""
+class UserAddPresenter(UserAddOutputBoundary):
+    """ユーザー登録結果を表示形式に変換するプレゼンター"""
     
-    def present_user(self, user: User) -> Dict[str, Any]:
-        """ユーザー情報をビューモデルに変換"""
-        view_model = UserViewModel(
-            id=user.id,
-            name=user.name,
-            email=user.email,
-            display_name=f"{user.name}さん"  # 日本語表示用に加工
-        )
-        return view_model.to_dict()
+    def __init__(self):
+        self.view_model = UserAddViewModel()
     
-    def present_users(self, users: List[User]) -> List[Dict[str, Any]]:
-        """ユーザーリストをビューモデルリストに変換"""
-        return [self.present_user(user) for user in users]
+    def output(self, output_data: UserAddOutputData) -> None:
+        """登録結果をビューモデルに変換"""
+        self.view_model.data = output_data.to_dict()
     
-    def present_error(self, message: str) -> Dict[str, Any]:
+    def output_error(self, output_data: ErrorOutputData) -> None:
         """エラー情報をビューモデルに変換"""
-        return {
-            "error": True,
-            "message": message
-        } 
+        self.view_model = ErrorViewModel()
+        self.view_model.data = output_data.to_dict()
+        
+    def get_view_model(self) -> Dict[str, Any]:
+        """ビューモデルを取得"""
+        return self.view_model.to_dict()
+
+class UserGetPresenter(UserGetOutputBoundary):
+    """ユーザー取得結果を表示形式に変換するプレゼンター"""
+    
+    def __init__(self):
+        self.view_model = UserGetViewModel()
+    
+    def output(self, output_data: UserGetOutputData) -> None:
+        """取得結果をビューモデルに変換"""
+        self.view_model.data = output_data.to_dict()
+    
+    def output_error(self, output_data: ErrorOutputData) -> None:
+        """エラー情報をビューモデルに変換"""
+        self.view_model = ErrorViewModel()
+        self.view_model.data = output_data.to_dict()
+        
+    def get_view_model(self) -> Dict[str, Any]:
+        """ビューモデルを取得"""
+        return self.view_model.to_dict()
+
+class UserGetAllPresenter(UserGetAllOutputBoundary):
+    """全ユーザー取得結果を表示形式に変換するプレゼンター"""
+    
+    def __init__(self):
+        self.view_model = UserGetAllViewModel()
+    
+    def output(self, output_data: UserGetAllOutputData) -> None:
+        """取得結果をビューモデルに変換"""
+        self.view_model.data = {"users": output_data.to_dict()["users"]}
+    
+    def output_error(self, output_data: ErrorOutputData) -> None:
+        """エラー情報をビューモデルに変換"""
+        self.view_model = ErrorViewModel()
+        self.view_model.data = output_data.to_dict()
+        
+    def get_view_model(self) -> List[Dict[str, Any]]:
+        """ビューモデルを取得"""
+        return self.view_model.to_dict()["users"] 

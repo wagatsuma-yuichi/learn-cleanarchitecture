@@ -1,12 +1,20 @@
 from fastapi import Depends
 from typing import Annotated
-import os
 
 from config.settings import get_settings
-from usecases.user.usecase import UserRepositoryInterface, UserUseCasesInteractor, UserInputBoundary, UserOutputBoundary
+from usecases.user.usecase import (
+    UserRepositoryInterface, 
+    UserAddInteractor, UserAddInputBoundary, UserAddOutputBoundary,
+    UserGetInteractor, UserGetInputBoundary, UserGetOutputBoundary,
+    UserGetAllInteractor, UserGetAllInputBoundary, UserGetAllOutputBoundary
+)
 from infrastructure.database.user.repository import UserRepositoryImpl
 from infrastructure.mock.user.repository import MockUserRepositoryImpl
-from interfaces.presenters.user.presenter import UserPresenter
+from interfaces.presenters.user.http_response_presenter import (
+    HttpResponseUserAddPresenter, 
+    HttpResponseUserGetPresenter, 
+    HttpResponseUserGetAllPresenter
+)
 
 def get_repository() -> UserRepositoryInterface:
     """環境設定に基づいてリポジトリを提供"""
@@ -36,13 +44,35 @@ def get_repository() -> UserRepositoryInterface:
             print(f"Connecting to database with URL: {db_url}")
             return UserRepositoryImpl(db_url=db_url)
 
-def get_presenter() -> UserOutputBoundary:
-    """プレゼンターを提供"""
-    return UserPresenter()
+def get_user_add_presenter() -> UserAddOutputBoundary:
+    """ユーザー登録用プレゼンターを提供"""
+    return HttpResponseUserAddPresenter()
 
-def get_usecase(
+def get_user_get_presenter() -> UserGetOutputBoundary:
+    """ユーザー取得用プレゼンターを提供"""
+    return HttpResponseUserGetPresenter()
+
+def get_user_get_all_presenter() -> UserGetAllOutputBoundary:
+    """全ユーザー取得用プレゼンターを提供"""
+    return HttpResponseUserGetAllPresenter()
+
+def get_user_add_usecase(
     repo: Annotated[UserRepositoryInterface, Depends(get_repository)],
-    presenter: Annotated[UserOutputBoundary, Depends(get_presenter)]
-) -> UserInputBoundary:
-    """ユースケースを提供"""
-    return UserUseCasesInteractor(repo, presenter) 
+    presenter: Annotated[UserAddOutputBoundary, Depends(get_user_add_presenter)]
+) -> UserAddInputBoundary:
+    """ユーザー登録用ユースケースを提供"""
+    return UserAddInteractor(repo, presenter)
+
+def get_user_get_usecase(
+    repo: Annotated[UserRepositoryInterface, Depends(get_repository)],
+    presenter: Annotated[UserGetOutputBoundary, Depends(get_user_get_presenter)]
+) -> UserGetInputBoundary:
+    """ユーザー取得用ユースケースを提供"""
+    return UserGetInteractor(repo, presenter)
+
+def get_user_get_all_usecase(
+    repo: Annotated[UserRepositoryInterface, Depends(get_repository)],
+    presenter: Annotated[UserGetAllOutputBoundary, Depends(get_user_get_all_presenter)]
+) -> UserGetAllInputBoundary:
+    """全ユーザー取得用ユースケースを提供"""
+    return UserGetAllInteractor(repo, presenter) 
